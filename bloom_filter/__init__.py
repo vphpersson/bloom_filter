@@ -5,7 +5,7 @@ from struct import pack as struct_pack, unpack_from as struct_unpack_from, Struc
 from math import ceil, log
 from functools import cached_property
 from collections.abc import Sized, Container
-from typing import SupportsBytes, Callable, Generator, Iterable, Tuple, Collection, List
+from typing import SupportsBytes, Callable, Generator, Iterable, Collection
 import hashlib
 
 from bitarray import bitarray
@@ -307,18 +307,18 @@ class BloomFilter(Sized, Container):
         if self._num_elements_mapped > self.capacity:
             raise IndexError('The Bloom filter is at capacity. The requested false positive rate cannot be fulfilled.')
 
-        bit_statuses: List[bool] = []
+        bit_statuses: list[bool] = []
 
         for slice_index, slice_bit_index in enumerate(self._hash(bytes(value))):
             bit_index: int = slice_index * self.num_bits_per_slice + slice_bit_index
-            bit_statuses.append(self._bit_array[bit_index])
+            bit_statuses.append(bool(self._bit_array[bit_index]))
             self._bit_array[bit_index] = True
 
         self._num_elements_mapped += 1
 
         return all(bit_statuses)
 
-    def update(self, *values: SupportsBytes) -> Tuple[bool, ...]:
+    def update(self, *values: SupportsBytes) -> tuple[bool, ...]:
         """
         Add multiple values to the Bloom filter.
 
